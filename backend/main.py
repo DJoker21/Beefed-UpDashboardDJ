@@ -6,6 +6,7 @@ Serves data from ml_results.json and bonsmara_interventions.csv
 
 import json
 import os
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Optional
 
@@ -15,21 +16,6 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-# ─── App init ────────────────────────────────────────────────────
-app = FastAPI(
-    title="Bonsmara GHG Dashboard API",
-    description="Greenhouse gas footprint prediction for Bonsmara cattle (South Africa)",
-    version="1.0.0",
-)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 # ─── Data loading (cached at startup) ────────────────────────────
 BASE_DIR = Path(__file__).parent.parent  # repo root
 
@@ -37,8 +23,8 @@ _ml_data: dict = {}
 _df: pd.DataFrame = pd.DataFrame()
 
 
-@app.on_event("startup")
-def load_data():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     global _ml_data, _df
     json_path = BASE_DIR / "ml_results.json"
     csv_path  = BASE_DIR / "bonsmara_interventions.csv"
@@ -52,6 +38,25 @@ def load_data():
         _df = pd.read_csv(csv_path)
     else:
         _df = pd.DataFrame()
+
+    yield
+
+
+# ─── App init ────────────────────────────────────────────────────
+app = FastAPI(
+    title="Bonsmara GHG Dashboard API",
+    description="Greenhouse gas footprint prediction for Bonsmara cattle (South Africa)",
+    version="1.0.0",
+    lifespan=lifespan,
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 def get_ml_data() -> dict:
@@ -84,11 +89,11 @@ def _int_stats(df: pd.DataFrame, col: str) -> dict:
     bl_adg = sub["Avg_Daily_Gain_kg"].mean()
     in_adg = sub["Int_ADG_kg"].mean()
 
-    ghg_red_pct  = (bl_ghg - in_ghg) / bl_ghg * 100
-    ch4_red_pct  = (bl_ch4 - in_ch4) / bl_ch4 * 100
-    seq_inc_pct  = (in_seq - bl_seq) / bl_seq * 100
-    ci_red_pct   = (bl_ci - in_ci) / bl_ci * 100
-    adg_inc_pct  = (in_adg - bl_adg) / bl_adg * 100
+    ghg_red_pct  = (bl_ghg - in_ghg) / bl_ghg * 100 if bl_ghg != 0 else 0.0
+    ch4_red_pct  = (bl_ch4 - in_ch4) / bl_ch4 * 100 if bl_ch4 != 0 else 0.0
+    seq_inc_pct  = (in_seq - bl_seq)  / bl_seq  * 100 if bl_seq  != 0 else 0.0
+    ci_red_pct   = (bl_ci  - in_ci)   / bl_ci   * 100 if bl_ci   != 0 else 0.0
+    adg_inc_pct  = (in_adg - bl_adg)  / bl_adg  * 100 if bl_adg  != 0 else 0.0
 
     # Economic model (matches Streamlit logic exactly)
     beef_price   = 65.0
@@ -249,7 +254,7 @@ def _predict_ghg(p: dict, mean_baseline: float) -> float:
 def predict(body: PredictInput):
     data = get_ml_data()
     mean_baseline = data["dataset"]["mean_baseline_ghg"]
-    params = body.dict()
+    params = body.model_dump()
 
     pred = _predict_ghg(params, mean_baseline)
     params_no_int = {**params, "moringa": False, "tannin": False, "genetic": False, "solar": False}
@@ -418,16 +423,6 @@ def dataset(
         "Delta_Net_GHG_CO2e_kg", "GHG_Gross_CO2e_kg",
     ]
 
-    # For scatter: return all filtered rows (x, y pairs)
-    scatter_data = {}
-    for col in scatter_x_options + scatter_y_options:
-        if col in df.columns:
-            scatter_data[col] = df[col].tolist()
-    # Also include color-by columns
-    for col in ["State", "Sex", "Housing_Type", "Grazing_System", "Forage_Type", "Veld_Condition"]:
-        if col in df.columns:
-            scatter_data[col] = df[col].tolist()
-
     return {
         "n_filtered":          len(df),
         "records":             subset.replace({float("nan"): None}).to_dict(orient="records"),
@@ -437,5 +432,55 @@ def dataset(
         "unique_sexes":        unique_sexes,
         "scatter_x_options":   [c for c in scatter_x_options if c in df.columns],
         "scatter_y_options":   [c for c in scatter_y_options if c in df.columns],
-        "scatter_data":        scatter_data,
     }
+
+
+# ─── GET /api/scatter ─────────────────────────────────────────────
+@app.get("/api/scatter")
+def scatter(
+    x: str = Query(..., description="X-axis column name"),
+    y: str = Query(..., description="Y-axis column name"),
+    color_by: Optional[str] = Query(None, description="Column to colour by"),
+    state: Optional[str] = Query(None),
+    sex: Optional[str] = Query(None),
+    intervention: Optional[str] = Query(None),
+):
+    df = get_df().copy()
+
+    if state:
+        states = [s.strip() for s in state.split(",")]
+        df = df[df["State"].isin(states)]
+
+    if sex:
+        sexes = [s.strip() for s in sex.split(",")]
+        df = df[df["Sex"].isin(sexes)]
+
+    if intervention and intervention.lower() not in ("all", ""):
+        iv = intervention.lower()
+        if iv == "any":
+            df = df[df["Num_Interventions"] > 0]
+        elif iv == "none":
+            df = df[df["Num_Interventions"] == 0]
+        elif iv == "moringa":
+            df = df[df["Intervention_Moringa"] == "Yes"]
+        elif iv == "tannin":
+            df = df[df["Intervention_Tannin"] == "Yes"]
+        elif iv == "genetic":
+            df = df[df["Intervention_Genetic"] == "Yes"]
+        elif iv == "solar":
+            df = df[df["Intervention_Solar"] == "Yes"]
+
+    for col in [x, y]:
+        if col not in df.columns:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Column '{col}' not found. Available columns: {sorted(df.columns.tolist())}",
+            )
+
+    cols = [x, y]
+    if color_by and color_by in df.columns and color_by not in cols:
+        cols.append(color_by)
+
+    result: dict = {c: df[c].tolist() for c in cols}
+    result["n_filtered"] = len(df)
+    return result
