@@ -1,2 +1,13 @@
 streamlit.out.log
 streamlit.err.log
+
+# Node
+frontend/node_modules/
+frontend/.next/
+frontend/.eslintrc.json
+
+# Python
+backend/__pycache__/
+*.pyc
+*.pyo
+

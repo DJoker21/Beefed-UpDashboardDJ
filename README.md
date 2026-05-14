@@ -1,48 +1,138 @@
 # Beefed-UpDashboard
 
-Beefed-UpDashboard is a Streamlit app for exploring greenhouse gas outcomes in Bonsmara cattle production. It combines model evaluation, intervention analysis, and interactive prediction tools in a single dashboard aimed at comparing baseline emissions with practical mitigation strategies.
+Bonsmara cattle greenhouse-gas (GHG) footprint prediction dashboard.
 
-## What the dashboard includes
+**Two versions:**
 
-- An overview page with headline metrics, baseline vs intervention comparisons, and quick model summaries
-- A model metrics section covering performance tables, comparison charts, actual-vs-predicted plots, confusion matrices, and feature insights
-- An interactive prediction workflow for estimating greenhouse gas output under different intervention choices
-- An intervention analysis section for adoption patterns, reduction impact, methane and sequestration trends, dose-response behavior, and farmer income uplift views
+| Version | Stack | Entry |
+|---------|-------|-------|
+| Streamlit (original) | Python | `bonsmara_dashboard.py` |
+| Next.js + FastAPI (new) | Node 18 + Python 3.11 | `/frontend` + `/backend` |
 
-## Project files
+The new version replicates all 7 pages in a dark-themed React SPA backed by a FastAPI REST API, deployable on Railway.
 
-- `bonsmara_dashboard.py`: main Streamlit application
-- `ml_results.json`: serialized model outputs and metrics used throughout the dashboard
-- `bonsmara_interventions.csv`: intervention and emissions dataset used for analysis and visualization
-- `.gitignore`: excludes local Streamlit log files from version control
+---
 
-## Requirements
+## Dashboard pages
 
-Install the Python packages used by the app:
+| # | Page | Route |
+|---|------|-------|
+| 1 | Overview — KPIs, GHG distribution, state comparison | `/` |
+| 2 | ML Model Metrics — 6 models, R², RMSE, confusion matrices | `/models` |
+| 3 | Feature Importance — top-15 features, RF vs GB comparison | `/features` |
+| 4 | Predict GHG Footprint — real-time sliders → prediction | `/predict` |
+| 5 | Intervention Analysis — adoption, dose-response, CH₄ | `/interventions` |
+| 6 | Farmer Benefits — income uplift, carbon credits, herd calculator | `/benefits` |
+| 7 | Dataset Explorer — filters, scatter, stats table | `/explorer` |
+
+---
+
+## Project structure
+
+```
+/
+├── bonsmara_dashboard.py       # Original Streamlit app (still works)
+├── ml_results.json             # ML model metrics + predictions
+├── bonsmara_interventions.csv  # 1,000 Bonsmara animal records
+│
+├── backend/                    # FastAPI service
+│   ├── main.py
+│   ├── requirements.txt
+│   └── railway.json
+│
+└── frontend/                   # Next.js + React service
+    ├── pages/                  # index, models, features, predict, interventions, benefits, explorer
+    ├── components/             # Navbar, Card, Layout, PlotlyChart
+    ├── lib/                    # api.js, theme.js
+    ├── styles/globals.css
+    ├── package.json
+    ├── next.config.js
+    └── railway.json
+```
+
+---
+
+## Local development
+
+### 1 — Backend (FastAPI)
+
+```bash
+cd backend
+pip install -r requirements.txt
+uvicorn main:app --reload --port 8000
+# API docs: http://localhost:8000/docs
+```
+
+### 2 — Frontend (Next.js)
+
+```bash
+cd frontend
+npm install
+npm run dev
+# Dashboard: http://localhost:3000
+```
+
+The frontend reads `NEXT_PUBLIC_API_URL` from `frontend/.env.local` (pre-set to `http://localhost:8000`).
+
+### 3 — Streamlit (legacy)
 
 ```bash
 pip install streamlit plotly scikit-learn pandas numpy
-```
-
-## Run locally
-
-From the project directory, start the dashboard with:
-
-```bash
 streamlit run bonsmara_dashboard.py
+# http://localhost:8501
 ```
 
-Streamlit will print a local URL, typically `http://localhost:8501`.
+---
 
-## Data expectations
+## Railway deployment
 
-The app expects these files to be present in the same directory as the dashboard script:
+Railway deploys the backend and frontend as two **separate services** in the same project.
 
-- `ml_results.json`
-- `bonsmara_interventions.csv`
+### Service 1 — Backend
 
-If `ml_results.json` is missing, the dashboard stops and shows an error message.
+1. Create a new Railway project → "Deploy from GitHub repo"
+2. Set the **Root Directory** to `backend`
+3. Railway auto-detects Python — set start command:
+   ```
+   uvicorn main:app --host 0.0.0.0 --port $PORT
+   ```
+4. Copy the generated backend URL (e.g. `https://bonsmara-api.up.railway.app`)
 
-## Notes
+### Service 2 — Frontend
 
-This repository currently stores the dashboard script and supporting data files directly at the project root for simple local execution.
+1. In the same project → "New Service" → same GitHub repo
+2. Set the **Root Directory** to `frontend`
+3. Add environment variable:
+   ```
+   NEXT_PUBLIC_API_URL=https://<your-backend-url>
+   ```
+4. Railway auto-detects Node / Next.js and runs `npm run build && npm run start`
+
+### Environment variables
+
+| Service | Variable | Example value |
+|---------|----------|---------------|
+| Frontend | `NEXT_PUBLIC_API_URL` | `https://bonsmara-api.up.railway.app` |
+| Backend | *(none required)* | — |
+
+---
+
+## Data files
+
+Both `ml_results.json` and `bonsmara_interventions.csv` must be at the **repository root** (one level above `backend/`). The backend resolves them via `Path(__file__).parent.parent`.
+
+---
+
+## API endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/health` | Health check |
+| GET | `/api/overview` | KPIs + distributions |
+| GET | `/api/models` | All 6 model metrics |
+| POST | `/api/predict` | GHG prediction |
+| GET | `/api/interventions` | Intervention stats |
+| GET | `/api/farmer-benefits` | Per-intervention economics |
+| GET | `/api/dataset` | Filtered dataset records |
+
+Full interactive docs at `/docs` (Swagger UI).

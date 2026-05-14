@@ -1,0 +1,8 @@
+{
+  "deploy": {
+    "startCommand": "npm run start",
+    "buildCommand": "npm run build",
+    "healthcheckPath": "/",
+    "healthcheckTimeout": 300
+  }
+}
