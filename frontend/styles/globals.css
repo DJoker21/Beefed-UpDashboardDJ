@@ -1,0 +1,424 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Sora:wght@300;400;600;700&display=swap');
+
+:root {
+  --bg:      #0D1117;
+  --card:    #161B22;
+  --border:  #30363D;
+  --accent:  #58A6FF;
+  --green:   #3FB950;
+  --orange:  #F78166;
+  --yellow:  #E3B341;
+  --purple:  #BC8CFF;
+  --teal:    #39D0D8;
+  --red:     #FF6B6B;
+  --text:    #E6EDF3;
+  --muted:   #8B949E;
+  --moringa: #2EA043;
+  --tannin:  #C06A2D;
+  --genetic: #1B7FC4;
+  --solar:   #D4A017;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Sora', sans-serif;
+  min-height: 100vh;
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* ── Layout ───────────────────────────────────────────────── */
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 240px;
+  min-width: 240px;
+  background: var(--card);
+  border-right: 1px solid var(--border);
+  padding: 20px 0;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.sidebar-brand {
+  text-align: center;
+  padding: 10px 16px 20px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+
+.sidebar-brand .emoji { font-size: 2.4rem; }
+.sidebar-brand .title {
+  font-family: 'Sora', sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--accent);
+  margin-top: 4px;
+}
+.sidebar-brand .sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+  margin-top: 2px;
+}
+
+.nav-list { list-style: none; padding: 0 8px; }
+.nav-item { margin-bottom: 2px; }
+.nav-link {
+  display: block;
+  padding: 9px 14px;
+  border-radius: 6px;
+  font-size: 0.87rem;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  font-family: 'Sora', sans-serif;
+}
+.nav-link:hover { background: var(--bg); color: var(--text); }
+.nav-link.active { background: var(--accent)22; color: var(--accent); font-weight: 600; }
+
+.sidebar-stats {
+  padding: 16px;
+  font-size: 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--muted);
+  line-height: 1.9;
+  border-top: 1px solid var(--border);
+  margin-top: auto;
+}
+
+.sidebar-states {
+  padding: 0 16px 16px;
+}
+
+.state-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  font-family: 'JetBrains Mono', monospace;
+  padding: 2px 0;
+}
+
+.main-content {
+  margin-left: 240px;
+  flex: 1;
+  padding: 32px 36px;
+  max-width: 100%;
+}
+
+/* ── Page header ─────────────────────────────────────────── */
+.page-header h1 {
+  font-size: 1.9rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.page-header p {
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.83rem;
+  margin-top: 4px;
+}
+.page-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 16px 0 24px;
+}
+
+/* ── KPI / Metric cards ──────────────────────────────────── */
+.metric-grid {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.metric-grid-5 { grid-template-columns: repeat(5, 1fr); }
+.metric-grid-4 { grid-template-columns: repeat(4, 1fr); }
+.metric-grid-3 { grid-template-columns: repeat(3, 1fr); }
+.metric-grid-2 { grid-template-columns: repeat(2, 1fr); }
+
+.metric-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.metric-card .accent-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: 10px 10px 0 0;
+}
+.metric-card .label {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-bottom: 4px;
+  font-family: 'Sora', sans-serif;
+}
+.metric-card .value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+.metric-card .sub {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* ── Tabs ─────────────────────────────────────────────────── */
+.tabs {
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 2px;
+  margin-bottom: 20px;
+  background: var(--card);
+  padding: 4px 4px 0;
+  border-radius: 8px 8px 0 0;
+}
+.tab-btn {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.83rem;
+  padding: 9px 16px;
+  border-radius: 6px 6px 0 0;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.tab-btn:hover { background: var(--bg); color: var(--text); }
+.tab-btn.active { background: var(--bg); color: var(--accent); font-weight: 600; }
+
+/* ── Chart card wrapper ──────────────────────────────────── */
+.chart-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+/* ── Two-column layouts ──────────────────────────────────── */
+.col-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.col-3-2 { display: grid; grid-template-columns: 3fr 2fr; gap: 16px; }
+.col-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+.col-1-1 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+/* ── Prediction page ──────────────────────────────────────── */
+.pred-result {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  margin-top: 12px;
+}
+.pred-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+.pred-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 4px;
+}
+
+/* ── Form inputs ─────────────────────────────────────────── */
+.form-section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 16px 0 10px;
+}
+.input-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.input-group.full { grid-template-columns: 1fr; }
+
+label {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-bottom: 3px;
+  font-family: 'JetBrains Mono', monospace;
+}
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+select {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  padding: 6px 10px;
+  width: 100%;
+  font-size: 0.82rem;
+  font-family: 'Sora', sans-serif;
+}
+.range-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--accent);
+  margin-left: 6px;
+}
+
+.checkbox-group {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 8px;
+}
+.checkbox-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 0.15s, background 0.15s;
+  user-select: none;
+  font-size: 0.8rem;
+}
+.checkbox-card.checked {
+  border-color: var(--accent);
+  background: var(--accent)15;
+}
+
+/* ── Table ───────────────────────────────────────────────── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  font-family: 'JetBrains Mono', monospace;
+}
+th {
+  background: var(--bg);
+  color: var(--muted);
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.78rem;
+}
+td {
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--border)55;
+  color: var(--text);
+}
+tr:hover td { background: var(--bg)88; }
+
+/* ── Loading / Error states ──────────────────────────────── */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+}
+.error-box {
+  background: var(--red)15;
+  border: 1px solid var(--red)50;
+  border-radius: 8px;
+  padding: 16px;
+  color: var(--red);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+}
+
+/* ── Footer ──────────────────────────────────────────────── */
+.footer {
+  text-align: center;
+  padding: 20px 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+  margin-top: 40px;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .sidebar { width: 180px; min-width: 180px; }
+  .main-content { margin-left: 180px; padding: 20px 16px; }
+  .metric-grid-5, .metric-grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .col-3-2, .col-2-1, .col-2 { grid-template-columns: 1fr; }
+  .checkbox-group { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .sidebar { display: none; }
+  .main-content { margin-left: 0; }
+  .metric-grid-5, .metric-grid-4, .metric-grid-3 { grid-template-columns: 1fr 1fr; }
+}
+
+/* ── Divider ─────────────────────────────────────────────── */
+hr { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+/* ── Adoption progress bar ───────────────────────────────── */
+.adoption-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+.adoption-bar-track {
+  background: var(--border);
+  border-radius: 4px;
+  width: 80px;
+  height: 6px;
+  overflow: hidden;
+  margin: 0 10px;
+}
+.adoption-bar-fill { height: 6px; border-radius: 4px; }
+
+/* ── Env card ─────────────────────────────────────────────── */
+.env-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+/* ── Info banner ─────────────────────────────────────────── */
+.info-banner {
+  border-radius: 12px;
+  padding: 18px 22px;
+  margin-bottom: 18px;
+  font-size: 0.83rem;
+  line-height: 1.7;
+}
+
+/* ── Progress bar (feature importance) ─────────────────── */
+.feat-bar-track {
+  background: var(--border);
+  border-radius: 4px;
+  height: 4px;
+  margin-top: 3px;
+}
+.feat-bar-fill { height: 4px; border-radius: 4px; }
