@@ -3,19 +3,21 @@ import { fetchInterventions } from '../lib/api';
 import Plot from '../components/PlotlyChart';
 import { P, INT_COLORS, INT_ICONS, pl } from '../lib/theme';
 
-const TABS = ['📊 GHG Comparison', '🔬 CH₄ & Sequestration', '📉 Dose-Response'];
+const TABS = ['GHG Comparison', 'CH₄ & Sequestration', 'Dose-Response'];
 
-const INT_INFO = {
-  Moringa: 'Reduces enteric CH₄ 10–20% · Improves N efficiency → less N₂O · +5–10% ADG boost',
-  Tannin:  'Condensed tannins suppress methanogens · 15–25% enteric CH₄ cut · Lower manure N excretion',
-  Genetic: 'Low-CH₄ EBV selection · 10–15% heritable CH₄ reduction · Improved feed conversion',
-  Solar:   'Replaces fossil energy on farm · 60–90% energy CO₂ eliminated · Added sequestration credit',
-};
+const TOP_PERFORMERS = [
+  { name: 'Asparagopsis Feed Additive', value: '-28.5', unit: '% CH₄', adoption: '1,240 Farms', icon: '🌱', color: '#2EA043' },
+  { name: 'Rotational Grazing (Intensive)', value: '+15.2', unit: '% Seq.', adoption: '3,850 Farms', icon: '🔄', color: '#39D0D8' },
+  { name: 'Anaerobic Digesters', value: '-42.0', unit: '% N₂O', adoption: '412 Farms', icon: '⚡', color: '#BC8CFF' },
+  { name: 'Improved Forage Quality', value: '-12.4', unit: '% Total', adoption: '5,120 Farms', icon: '🌾', color: '#E3B341' },
+];
 
 export default function InterventionsPage() {
   const [data, setData]   = useState(null);
   const [error, setError] = useState(null);
   const [tab, setTab]     = useState(0);
+  const [stateFilter, setStateFilter] = useState('All States');
+  const [metricFilter, setMetricFilter] = useState('CO₂e');
 
   useEffect(() => {
     fetchInterventions()
@@ -29,12 +31,9 @@ export default function InterventionsPage() {
   const intNames  = ['Moringa', 'Tannin', 'Genetic', 'Solar'];
   const intColors = intNames.map(n => INT_COLORS[n]);
 
-  const adoptionPcts = intNames.map(n =>
-    ((data.adoption[n] || 0) / data.n_total * 100).toFixed(1)
-  );
   const reductions = intNames.map(n => Math.abs(data.reduction_by_int[n] || 0));
 
-  // Dose-response calculation (matches Streamlit)
+  // Dose-response calculation
   const nInts = [0, 1, 2, 3, 4];
   const perIntRed = reductions.reduce((a, b) => a + b, 0) / 4;
   const doseGhg   = nInts.map(k => data.mean_baseline_ghg - Math.max(0, k * perIntRed * (1 - 0.1 * k)));
@@ -44,206 +43,268 @@ export default function InterventionsPage() {
   const stateVals  = Object.values(data.ghg_by_state);
   const intByState = stateVals.map(v => v * (1 - data.mean_reduction_pct / 100));
 
+  // Mock data for emissions by source category
+  const sourceCategories = ['Enteric', 'Manure Management', 'Feed Production', 'Energy Use'];
+  const baselineEmissions = [4500, 1800, 2200, 800];
+  const postIntEmissions = [3200, 1200, 1900, 500];
+
   return (
     <>
-      <div className="page-header">
-        <h1>💉 Intervention Analysis</h1>
-        <p>Moringa · Tannin · Genetic Selection · Solar Panels — baseline vs. intervention comparison</p>
+      {/* Header */}
+      <div className="intervention-header">
+        <h1>Intervention Analysis</h1>
+        <p>Compare the efficacy of GHG reduction strategies</p>
       </div>
-      <hr className="page-divider" />
 
-      {/* Adoption cards */}
-      <h3 style={{ marginBottom: 12, fontSize: '0.95rem' }}>Intervention Adoption & GHG Reduction</h3>
-      <div className="metric-grid metric-grid-4">
-        {intNames.map((name, i) => {
-          const color = intColors[i];
-          const icon  = INT_ICONS[name];
-          const red   = reductions[i];
-          const pct   = (red / data.mean_baseline_ghg * 100).toFixed(1);
-          const n     = data.adoption[name] || 0;
-          const adPct = (n / data.n_total * 100).toFixed(0);
-          return (
-            <div key={name} className="metric-card" style={{ borderColor: color + '50' }}>
-              <div className="accent-bar" style={{ background: color }} />
-              <div style={{ fontSize: '1.3rem', marginBottom: 6 }}>{icon} {name}</div>
-              <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '1.2rem', fontWeight: 700, color }}>
-                −{red.toLocaleString(undefined, { maximumFractionDigits: 0 })} kg
+      {/* Top Performer KPI Cards */}
+      <div className="top-performer-grid">
+        {TOP_PERFORMERS.map((perf, idx) => (
+          <div key={idx} className="top-performer-card">
+            <div className="top-performer-header">
+              <div className="top-performer-icon" style={{ background: `${perf.color}15` }}>
+                {perf.icon}
               </div>
-              <div className="sub" style={{ color }}>{pct}% reduction</div>
-              <div style={{ marginTop: 8, paddingTop: 8, borderTop: `1px solid ${P.border}`, fontSize: '0.75rem', color: P.muted, fontFamily: 'JetBrains Mono, monospace' }}>
-                {n} animals ({adPct}% adoption)
-              </div>
-              <details style={{ marginTop: 6 }}>
-                <summary style={{ fontSize: '0.78rem', color: P.muted, cursor: 'pointer' }}>📖 Mechanism</summary>
-                <p style={{ fontSize: '0.78rem', color: P.muted, marginTop: 4, lineHeight: 1.5 }}>{INT_INFO[name]}</p>
-              </details>
+              <div className="top-performer-badge">Top Performer</div>
             </div>
-          );
-        })}
-      </div>
-
-      <br />
-      <div className="tabs">
-        {TABS.map((t, i) => (
-          <button key={i} className={`tab-btn${tab === i ? ' active' : ''}`} onClick={() => setTab(i)}>{t}</button>
+            <div className="top-performer-title">{perf.name}</div>
+            <div>
+              <span className="top-performer-value" style={{ color: perf.color }}>
+                {perf.value}
+              </span>
+              <span className="top-performer-unit">{perf.unit}</span>
+            </div>
+            <div className="top-performer-metric">
+              <span className="top-performer-metric-dot" style={{ background: perf.color }}></span>
+              <span>Adoption: {perf.adoption}</span>
+            </div>
+          </div>
         ))}
       </div>
 
-      {/* Tab 0: GHG Comparison */}
-      {tab === 0 && (
-        <div className="col-2">
-          <div className="chart-card">
-            <Plot
-              data={[
-                { type: 'bar', name: 'Baseline', x: stateKeys, y: stateVals,
-                  marker: { color: P.orange, opacity: 0.85 },
-                  text: stateVals.map(v => v.toLocaleString(undefined, { maximumFractionDigits: 0 })),
-                  textposition: 'outside' },
-                { type: 'bar', name: 'With Interventions', x: stateKeys, y: intByState,
-                  marker: { color: P.green, opacity: 0.85 },
-                  text: intByState.map(v => v.toLocaleString(undefined, { maximumFractionDigits: 0 })),
-                  textposition: 'outside' },
-              ]}
-              layout={pl({
-                barmode: 'group', height: 380,
-                title: 'Net GHG by State — Baseline vs Intervention',
-                yaxis: { ...pl().yaxis, title: 'kg CO₂e/head/yr' },
-              })}
-              config={{ displayModeBar: false }}
-              style={{ width: '100%' }}
-              useResizeHandler
-            />
+      {/* Tabbed Section */}
+      <div className="tabbed-section">
+        <div className="tabs-with-filters">
+          <div className="tabs-left">
+            {TABS.map((t, i) => (
+              <button
+                key={i}
+                className={`tab-btn${tab === i ? ' active' : ''}`}
+                onClick={() => setTab(i)}
+              >
+                {t}
+              </button>
+            ))}
           </div>
-
-          <div className="chart-card">
-            <Plot
-              data={[{
-                type: 'bar',
-                x: intNames, y: reductions,
-                marker: { color: intColors },
-                text: reductions.map(v => `−${v.toLocaleString(undefined, { maximumFractionDigits: 0 })} kg`),
-                textposition: 'outside',
-                textfont: { family: 'JetBrains Mono, monospace', size: 11 },
-              }]}
-              layout={pl({
-                height: 380,
-                title: 'Mean GHG Reduction per Intervention',
-                yaxis: { ...pl().yaxis, title: 'kg CO₂e/head/yr' },
-              })}
-              config={{ displayModeBar: false }}
-              style={{ width: '100%' }}
-              useResizeHandler
-            />
+          <div className="tabs-filters">
+            <select
+              className="filter-select"
+              value={stateFilter}
+              onChange={(e) => setStateFilter(e.target.value)}
+            >
+              <option>Filter: All States</option>
+              <option>Filter: Limpopo</option>
+              <option>Filter: North West</option>
+              <option>Filter: Free State</option>
+            </select>
+            <select
+              className="filter-select"
+              value={metricFilter}
+              onChange={(e) => setMetricFilter(e.target.value)}
+            >
+              <option>Metric: CO₂e</option>
+              <option>Metric: CH₄</option>
+              <option>Metric: N₂O</option>
+            </select>
           </div>
         </div>
-      )}
 
-      {/* Tab 1: CH₄ & Sequestration */}
-      {tab === 1 && (
-        <>
-          <div className="col-2">
-            <div className="chart-card">
+        <div className="tab-content">
+          {/* Tab 0: GHG Comparison */}
+          {tab === 0 && (
+            <div className="chart-grid-2">
+              <div className="chart-card-intervention">
+                <div className="chart-title">Emissions by Source Category</div>
+                <div className="chart-subtitle">
+                  Baseline vs. Asparagopsis + Rotational Grazing
+                  <svg viewBox="0 0 16 16" fill="none">
+                    <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5"/>
+                    <path d="M8 7V11M8 5V5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                  </svg>
+                </div>
+                <Plot
+                  data={[
+                    {
+                      type: 'bar',
+                      name: 'Baseline (tCO₂e)',
+                      x: sourceCategories,
+                      y: baselineEmissions,
+                      marker: { color: '#E3B341' },
+                    },
+                    {
+                      type: 'bar',
+                      name: 'Post-Intervention (CO₂e)',
+                      x: sourceCategories,
+                      y: postIntEmissions,
+                      marker: { color: '#2EA043' },
+                    },
+                  ]}
+                  layout={pl({
+                    height: 360,
+                    barmode: 'group',
+                    showlegend: true,
+                    legend: { orientation: 'h', y: 1.15, x: 0.5, xanchor: 'center' },
+                    margin: { l: 50, r: 20, t: 20, b: 80 },
+                    xaxis: { ...pl().xaxis, tickangle: -20 },
+                    yaxis: { ...pl().yaxis, title: '' },
+                  })}
+                  config={{ displayModeBar: false }}
+                  style={{ width: '100%' }}
+                  useResizeHandler
+                />
+              </div>
+
+              <div className="chart-card-intervention">
+                <div className="chart-title">Regional Intervention Efficacy</div>
+                <div className="chart-subtitle">Top 5 states by absolute reduction volume</div>
+                <Plot
+                  data={[
+                    {
+                      type: 'bar',
+                      name: 'Baseline',
+                      x: stateVals.slice(0, 5),
+                      y: stateKeys.slice(0, 5),
+                      orientation: 'h',
+                      marker: { color: '#E3B341' },
+                    },
+                    {
+                      type: 'bar',
+                      name: 'Intervention',
+                      x: intByState.slice(0, 5),
+                      y: stateKeys.slice(0, 5),
+                      orientation: 'h',
+                      marker: { color: '#2EA043' },
+                    },
+                  ]}
+                  layout={pl({
+                    height: 360,
+                    barmode: 'overlay',
+                    showlegend: true,
+                    legend: { orientation: 'h', y: 1.15, x: 0.5, xanchor: 'center' },
+                    margin: { l: 80, r: 20, t: 20, b: 40 },
+                    xaxis: { ...pl().xaxis, title: '' },
+                    yaxis: { ...pl().yaxis, title: '' },
+                  })}
+                  config={{ displayModeBar: false }}
+                  style={{ width: '100%' }}
+                  useResizeHandler
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Tab 1: CH₄ & Sequestration */}
+          {tab === 1 && (
+            <div className="chart-grid-2">
+              <div className="chart-card-intervention">
+                <div className="chart-title">Avg CH₄ Emissions by Forage Type</div>
+                <Plot
+                  data={[{
+                    type: 'bar',
+                    x: Object.keys(data.ch4_by_forage),
+                    y: Object.values(data.ch4_by_forage),
+                    marker: { color: [P.orange, P.yellow, P.teal, P.purple] },
+                    text: Object.values(data.ch4_by_forage).map(v => `${v.toFixed(1)} kg`),
+                    textposition: 'outside',
+                    textfont: { family: 'JetBrains Mono, monospace', size: 10 },
+                  }]}
+                  layout={pl({
+                    height: 340,
+                    yaxis: { ...pl().yaxis, title: 'kg CH₄/head/yr' },
+                    margin: { l: 50, r: 20, t: 20, b: 80 },
+                  })}
+                  config={{ displayModeBar: false }}
+                  style={{ width: '100%' }}
+                  useResizeHandler
+                />
+              </div>
+
+              <div className="chart-card-intervention">
+                <div className="chart-title">Carbon Sequestration by Grazing System</div>
+                <Plot
+                  data={[{
+                    type: 'bar',
+                    x: Object.keys(data.seq_by_grazing),
+                    y: Object.values(data.seq_by_grazing),
+                    marker: { color: [P.green, P.teal, P.accent] },
+                    text: Object.values(data.seq_by_grazing).map(v => `${v.toFixed(0)} kg`),
+                    textposition: 'outside',
+                    textfont: { family: 'JetBrains Mono, monospace', size: 10 },
+                  }]}
+                  layout={pl({
+                    height: 340,
+                    yaxis: { ...pl().yaxis, title: 'kg CO₂/head/yr' },
+                    margin: { l: 50, r: 20, t: 20, b: 80 },
+                  })}
+                  config={{ displayModeBar: false }}
+                  style={{ width: '100%' }}
+                  useResizeHandler
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Tab 2: Dose-Response */}
+          {tab === 2 && (
+            <div className="chart-card-intervention">
+              <div className="chart-title">GHG Footprint by Number of Simultaneous Interventions</div>
+              <div className="chart-subtitle">Dose-Response: More Interventions → Lower GHG</div>
               <Plot
-                data={[{
-                  type: 'bar',
-                  x: Object.keys(data.ch4_by_forage),
-                  y: Object.values(data.ch4_by_forage),
-                  marker: { color: [P.orange, P.yellow, P.teal, P.purple] },
-                  text: Object.values(data.ch4_by_forage).map(v => `${v.toFixed(1)} kg`),
-                  textposition: 'outside',
-                  textfont: { family: 'JetBrains Mono, monospace', size: 10 },
-                }]}
+                data={[
+                  {
+                    type: 'bar',
+                    name: 'Animal Count',
+                    x: nInts,
+                    y: doseCounts,
+                    marker: { color: P.border, opacity: 0.5 },
+                    yaxis: 'y2',
+                  },
+                  {
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    name: 'Net GHG',
+                    x: nInts,
+                    y: doseGhg,
+                    line: { color: P.accent, width: 3 },
+                    marker: { size: 10, color: P.accent },
+                    yaxis: 'y',
+                  },
+                ]}
                 layout={pl({
-                  height: 340,
-                  title: 'Avg CH₄ Emissions by Forage Type',
-                  yaxis: { ...pl().yaxis, title: 'kg CH₄/head/yr' },
+                  height: 400,
+                  xaxis: {
+                    ...pl().xaxis,
+                    title: 'Number of Interventions Applied',
+                    tickvals: nInts,
+                    ticktext: nInts.map(k => `${k} Int.`)
+                  },
+                  yaxis: { ...pl().yaxis, title: 'Net GHG (kg CO₂e/head/yr)' },
+                  yaxis2: {
+                    title: 'Count',
+                    overlaying: 'y',
+                    side: 'right',
+                    showgrid: false,
+                    color: P.muted
+                  },
+                  margin: { l: 60, r: 60, t: 20, b: 60 },
                 })}
                 config={{ displayModeBar: false }}
                 style={{ width: '100%' }}
                 useResizeHandler
               />
             </div>
-
-            <div className="chart-card">
-              <Plot
-                data={[{
-                  type: 'bar',
-                  x: Object.keys(data.seq_by_grazing),
-                  y: Object.values(data.seq_by_grazing),
-                  marker: { color: [P.green, P.teal, P.accent] },
-                  text: Object.values(data.seq_by_grazing).map(v => `${v.toFixed(0)} kg`),
-                  textposition: 'outside',
-                  textfont: { family: 'JetBrains Mono, monospace', size: 10 },
-                }]}
-                layout={pl({
-                  height: 340,
-                  title: 'Carbon Sequestration by Grazing System',
-                  yaxis: { ...pl().yaxis, title: 'kg CO₂/head/yr' },
-                })}
-                config={{ displayModeBar: false }}
-                style={{ width: '100%' }}
-                useResizeHandler
-              />
-            </div>
-          </div>
-
-          <div className="chart-card">
-            <Plot
-              data={[{
-                type: 'bar',
-                x: Object.keys(data.ghg_by_housing),
-                y: Object.values(data.ghg_by_housing),
-                marker: { color: [P.green, P.yellow, P.orange] },
-                text: Object.values(data.ghg_by_housing).map(v => v.toLocaleString(undefined, { maximumFractionDigits: 0 })),
-                textposition: 'outside',
-              }]}
-              layout={pl({
-                height: 280,
-                title: 'Avg Net GHG by Housing Type',
-                yaxis: { ...pl().yaxis, title: 'kg CO₂e/head/yr' },
-              })}
-              config={{ displayModeBar: false }}
-              style={{ width: '100%' }}
-              useResizeHandler
-            />
-          </div>
-        </>
-      )}
-
-      {/* Tab 2: Dose-Response */}
-      {tab === 2 && (
-        <div className="chart-card">
-          <h3 style={{ marginBottom: 10, fontSize: '0.9rem' }}>GHG Footprint by Number of Simultaneous Interventions</h3>
-          <Plot
-            data={[
-              {
-                type: 'bar', name: 'Animal Count',
-                x: nInts, y: doseCounts,
-                marker: { color: P.border, opacity: 0.5 },
-                yaxis: 'y2',
-              },
-              {
-                type: 'scatter', mode: 'lines+markers', name: 'Net GHG',
-                x: nInts, y: doseGhg,
-                line: { color: P.accent, width: 3 },
-                marker: { size: 10, color: P.accent },
-                yaxis: 'y',
-              },
-            ]}
-            layout={pl({
-              height: 360,
-              title: 'Dose-Response: More Interventions → Lower GHG',
-              xaxis: { ...pl().xaxis, title: 'Number of Interventions Applied',
-                tickvals: nInts, ticktext: nInts.map(k => `${k} Int.`) },
-              yaxis:  { ...pl().yaxis, title: 'Net GHG (kg CO₂e/head/yr)' },
-              yaxis2: { title: 'Count', overlaying: 'y', side: 'right', showgrid: false, color: P.muted },
-            })}
-            config={{ displayModeBar: false }}
-            style={{ width: '100%' }}
-            useResizeHandler
-          />
+          )}
         </div>
-      )}
+      </div>
     </>
   );
 }

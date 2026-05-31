@@ -458,6 +458,11 @@ tr:hover td { background: var(--bg)88; }
   .checkbox-group { grid-template-columns: repeat(2, 1fr); }
   .predict-layout { grid-template-columns: 1fr; }
   .emission-breakdown { grid-template-columns: repeat(2, 1fr); }
+  .top-performer-grid { grid-template-columns: repeat(2, 1fr); }
+  .chart-grid-2 { grid-template-columns: 1fr; }
+  .tabs-with-filters { flex-direction: column; align-items: stretch; gap: 8px; }
+  .tabs-left { width: 100%; overflow-x: auto; }
+  .tabs-filters { width: 100%; justify-content: flex-start; }
 }
 @media (max-width: 600px) {
   .sidebar { display: none; }
@@ -466,6 +471,7 @@ tr:hover td { background: var(--bg)88; }
   .emission-breakdown { grid-template-columns: 1fr; }
   .livestock-buttons { grid-template-columns: repeat(2, 1fr); }
   .intensity-gauge { flex-direction: column; }
+  .top-performer-grid { grid-template-columns: 1fr; }
 }
 
 /* ── Divider ─────────────────────────────────────────────── */
@@ -911,6 +917,216 @@ input[type="range"]::-moz-range-thumb {
   font-size: 0.85rem;
   color: var(--muted);
   line-height: 1.5;
+}
+
+/* ── Intervention Page Specific ──────────────────────────── */
+.intervention-header {
+  margin-bottom: 24px;
+}
+
+.intervention-header h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: var(--text);
+}
+
+.intervention-header p {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.top-performer-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.top-performer-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  transition: box-shadow 0.2s;
+}
+
+.top-performer-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+.top-performer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.top-performer-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  background: rgba(46,160,67,0.1);
+}
+
+.top-performer-badge {
+  font-size: 0.7rem;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.top-performer-title {
+  font-size: 0.85rem;
+  color: var(--text);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.top-performer-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.top-performer-unit {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-left: 4px;
+  font-weight: 400;
+}
+
+.top-performer-metric {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.top-performer-metric-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.tabbed-section {
+  margin-top: 32px;
+}
+
+.tabs-with-filters {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px 8px 0 0;
+  padding: 4px;
+  margin-bottom: 0;
+}
+
+.tabs-left {
+  display: flex;
+  gap: 2px;
+}
+
+.tab-btn {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-family: 'Sora', sans-serif;
+  font-size: 0.83rem;
+  padding: 9px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  font-weight: 500;
+}
+
+.tab-btn:hover {
+  background: rgba(46,160,67,0.05);
+  color: var(--text);
+}
+
+.tab-btn.active {
+  background: rgba(46,160,67,0.1);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.tabs-filters {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.filter-select {
+  padding: 6px 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 0.75rem;
+  font-family: 'Sora', sans-serif;
+  cursor: pointer;
+  min-width: 140px;
+}
+
+.tab-content {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  padding: 20px;
+}
+
+.chart-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.chart-card-intervention {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.chart-card-intervention .chart-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: var(--text);
+}
+
+.chart-card-intervention .chart-subtitle {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chart-subtitle svg {
+  width: 14px;
+  height: 14px;
+  opacity: 0.5;
 }
 
 /* ── Adoption progress bar ───────────────────────────────── */
