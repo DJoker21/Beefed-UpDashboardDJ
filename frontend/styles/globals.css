@@ -463,6 +463,9 @@ tr:hover td { background: var(--bg)88; }
   .tabs-with-filters { flex-direction: column; align-items: stretch; gap: 8px; }
   .tabs-left { width: 100%; overflow-x: auto; }
   .tabs-filters { width: 100%; justify-content: flex-start; }
+  .benefits-kpi-row { grid-template-columns: repeat(2, 1fr); }
+  .benefits-intervention-cards { grid-template-columns: 1fr; }
+  .roi-hero { padding: 32px 24px; }
 }
 @media (max-width: 600px) {
   .sidebar { display: none; }
@@ -472,6 +475,9 @@ tr:hover td { background: var(--bg)88; }
   .livestock-buttons { grid-template-columns: repeat(2, 1fr); }
   .intensity-gauge { flex-direction: column; }
   .top-performer-grid { grid-template-columns: 1fr; }
+  .benefits-kpi-row { grid-template-columns: 1fr; }
+  .roi-hero-actions { flex-direction: column; width: 100%; }
+  .roi-hero-btn-primary, .roi-hero-btn-secondary { width: 100%; justify-content: center; }
 }
 
 /* ── Divider ─────────────────────────────────────────────── */
@@ -1127,6 +1133,365 @@ input[type="range"]::-moz-range-thumb {
   width: 14px;
   height: 14px;
   opacity: 0.5;
+}
+
+/* ── Benefits Page Specific ──────────────────────────────── */
+.benefits-header {
+  margin-bottom: 24px;
+}
+
+.benefits-header h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: var(--text);
+}
+
+.benefits-header p {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.benefits-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.benefits-kpi-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  transition: box-shadow 0.2s;
+}
+
+.benefits-kpi-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+.benefits-kpi-icon {
+  font-size: 1.3rem;
+  margin-bottom: 8px;
+}
+
+.benefits-kpi-trend {
+  font-size: 0.7rem;
+  color: var(--muted);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.benefits-kpi-trend-arrow {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.benefits-kpi-label {
+  font-size: 0.75rem;
+  color: var(--text);
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.benefits-kpi-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.benefits-kpi-unit {
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+.roi-hero {
+  background: linear-gradient(135deg, rgba(46,160,67,0.95) 0%, rgba(31,122,48,0.92) 100%),
+              url('https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=1600&q=80');
+  background-size: cover;
+  background-position: center;
+  border-radius: 16px;
+  padding: 48px;
+  margin-bottom: 32px;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.roi-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(46,160,67,0.2) 0%, rgba(31,122,48,0.4) 100%);
+  z-index: 1;
+}
+
+.roi-hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 600px;
+}
+
+.roi-hero-tag {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.9);
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.roi-hero-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  line-height: 1.2;
+}
+
+.roi-hero-title .highlight {
+  color: #A7F3D0;
+}
+
+.roi-hero-text {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  margin-bottom: 24px;
+  color: rgba(255,255,255,0.95);
+}
+
+.roi-hero-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.roi-hero-btn-primary {
+  padding: 12px 24px;
+  background: white;
+  color: var(--accent);
+  border: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.roi-hero-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.roi-hero-btn-secondary {
+  padding: 12px 24px;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.2s;
+}
+
+.roi-hero-btn-secondary:hover {
+  background: rgba(255,255,255,0.25);
+}
+
+.benefits-intervention-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.benefit-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  transition: box-shadow 0.2s;
+}
+
+.benefit-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+.benefit-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.benefit-card-category {
+  font-size: 0.7rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.benefit-card-badge {
+  font-size: 0.65rem;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.benefit-card-badge.high-impact {
+  background: rgba(46,160,67,0.1);
+  color: var(--accent);
+}
+
+.benefit-card-badge.best-roi {
+  background: rgba(227,179,65,0.1);
+  color: var(--yellow);
+}
+
+.benefit-card-badge.steady-gain {
+  background: rgba(57,208,216,0.1);
+  color: var(--teal);
+}
+
+.benefit-card-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.benefit-card-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.benefit-card-metric {
+  display: flex;
+  flex-direction: column;
+}
+
+.benefit-card-metric-label {
+  font-size: 0.7rem;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.benefit-card-metric-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.benefit-card-chart {
+  height: 80px;
+  margin: 12px -8px;
+  position: relative;
+}
+
+.benefit-card-chart canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.benefit-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.benefit-card-roi {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.benefit-card-roi-icon {
+  font-size: 1rem;
+}
+
+.benefit-card-roi-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.benefit-card-link {
+  font-size: 0.75rem;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: gap 0.2s;
+}
+
+.benefit-card-link:hover {
+  gap: 8px;
+}
+
+.evaluate-card {
+  background: var(--card);
+  border: 2px dashed var(--border);
+  border-radius: 10px;
+  padding: 32px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.evaluate-card:hover {
+  border-color: var(--accent);
+  background: rgba(46,160,67,0.02);
+}
+
+.evaluate-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(46,160,67,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  color: var(--accent);
+  margin: 0 auto 12px;
+}
+
+.evaluate-card-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.evaluate-card-text {
+  font-size: 0.75rem;
+  color: var(--muted);
+  line-height: 1.5;
 }
 
 /* ── Adoption progress bar ───────────────────────────────── */
