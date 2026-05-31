@@ -2225,3 +2225,277 @@ input[type="range"]::-moz-range-thumb {
   margin-top: 3px;
 }
 .feat-bar-fill { height: 4px; border-radius: 4px; }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   MODEL PERFORMANCE METRICS PAGE
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Model metrics header ────────────────────────────────── */
+.models-header {
+  margin-bottom: 24px;
+}
+.models-header h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+.models-header p {
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* ── Model metrics tabs ────────────────────────────────── */
+.models-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 0;
+}
+.models-tab-btn {
+  background: transparent;
+  border: none;
+  padding: 12px 20px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s;
+  font-family: 'Sora', sans-serif;
+}
+.models-tab-btn:hover {
+  color: var(--text);
+  background: rgba(46, 160, 67, 0.05);
+}
+.models-tab-btn.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  font-weight: 600;
+}
+
+/* ── Model KPI cards ────────────────────────────────────── */
+.model-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.model-kpi-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.model-kpi-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+.model-kpi-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.model-kpi-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+.model-kpi-icon.accuracy {
+  background: rgba(46, 160, 67, 0.1);
+  color: var(--accent);
+}
+.model-kpi-icon.precision {
+  background: rgba(57, 208, 216, 0.1);
+  color: var(--teal);
+}
+.model-kpi-icon.recall {
+  background: rgba(227, 179, 65, 0.1);
+  color: var(--yellow);
+}
+.model-kpi-icon.f1 {
+  background: rgba(188, 140, 255, 0.1);
+  color: var(--purple);
+}
+.model-kpi-trend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+}
+.model-kpi-trend.positive {
+  color: var(--green);
+}
+.model-kpi-trend.negative {
+  color: var(--red);
+}
+.model-kpi-trend svg {
+  width: 16px;
+  height: 16px;
+}
+.model-kpi-label {
+  font-size: 0.82rem;
+  color: var(--muted);
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+.model-kpi-value {
+  font-size: 2rem;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text);
+  line-height: 1;
+}
+
+/* ── Model performance table ───────────────────────────── */
+.model-perf-section {
+  margin-bottom: 28px;
+}
+.model-perf-section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+.model-perf-section-subtitle {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+.model-performance-table {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.model-performance-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.model-performance-table thead {
+  background: rgba(46, 160, 67, 0.04);
+  border-bottom: 2px solid var(--border);
+}
+.model-performance-table th {
+  padding: 14px 16px;
+  text-align: left;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.model-performance-table td {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.88rem;
+  color: var(--text);
+}
+.model-performance-table tbody tr:last-child td {
+  border-bottom: none;
+}
+.model-performance-table tbody tr:hover {
+  background: rgba(46, 160, 67, 0.02);
+}
+.model-performance-table .model-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.model-performance-table .model-architecture {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.model-performance-table .metric-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+}
+.model-status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.model-status-badge.baseline {
+  background: rgba(227, 179, 65, 0.15);
+  color: #B8860B;
+}
+.model-status-badge.experimental {
+  background: rgba(27, 127, 196, 0.15);
+  color: #1B7FC4;
+}
+.model-status-badge.production {
+  background: rgba(46, 160, 67, 0.15);
+  color: var(--accent);
+}
+
+/* ── Model selector ──────────────────────────────────────── */
+.model-selector-row {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.model-selector-row label {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text);
+}
+.model-selector-row select {
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--text);
+  font-size: 0.88rem;
+  font-family: 'Sora', sans-serif;
+  cursor: pointer;
+  min-width: 260px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.model-selector-row select:hover {
+  border-color: var(--accent);
+}
+.model-selector-row select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(46, 160, 67, 0.1);
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 1200px) {
+  .model-kpi-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 768px) {
+  .model-kpi-row {
+    grid-template-columns: 1fr;
+  }
+  .models-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+  .models-tab-btn {
+    white-space: nowrap;
+  }
+}
