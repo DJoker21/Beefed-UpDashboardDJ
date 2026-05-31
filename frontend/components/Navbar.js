@@ -18,8 +18,8 @@ export default function Navbar({ sidebarData }) {
     <nav className="sidebar">
       <div className="sidebar-brand">
         <div className="emoji">🐄</div>
-        <div className="title">Bonsmara GHG</div>
-        <div className="sub">GREENHOUSE FOOTPRINT PREDICTION</div>
+        <div className="title">Bonsmara</div>
+        <div className="sub">GHG ANALYTICS PLATFORM</div>
       </div>
 
       <ul className="nav-list">
@@ -35,32 +35,32 @@ export default function Navbar({ sidebarData }) {
       {sidebarData && (
         <>
           <div className="sidebar-stats">
-            <span style={{ color: 'var(--green)', fontWeight: 600 }}>Dataset</span>
+            <span style={{ color: 'rgba(255,255,255,0.95)', fontWeight: 600 }}>Dataset</span>
             <br />
             {sidebarData.n_total} animals · {sidebarData.n_states} states
             <br /><br />
-            <span style={{ color: 'var(--accent)', fontWeight: 600 }}>Models Trained</span>
+            <span style={{ color: 'rgba(255,255,255,0.95)', fontWeight: 600 }}>Models Trained</span>
             <br />6 ML algorithms
             <br /><br />
-            <span style={{ color: 'var(--yellow)', fontWeight: 600 }}>Best Model</span>
+            <span style={{ color: 'rgba(255,255,255,0.95)', fontWeight: 600 }}>Best Model</span>
             <br />Gradient Boosting
             <br />R² = {sidebarData.models_summary?.['Gradient Boosting']?.reg_r2}
             <br /><br />
-            <span style={{ color: 'var(--purple)', fontWeight: 600 }}>Interventions</span>
+            <span style={{ color: 'rgba(255,255,255,0.95)', fontWeight: 600 }}>Interventions</span>
             <br />Moringa · Tannin
             <br />Genetics · Solar
           </div>
 
-          <hr style={{ margin: '0 16px', borderColor: 'var(--border)' }} />
+          <hr style={{ margin: '0 16px', borderColor: 'rgba(255,255,255,0.2)' }} />
 
           <div className="sidebar-states" style={{ paddingTop: 12 }}>
-            <div style={{ fontSize: '0.7rem', color: 'var(--muted)', marginBottom: 6, fontFamily: 'JetBrains Mono, monospace' }}>
+            <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.7)', marginBottom: 6, fontFamily: 'JetBrains Mono, monospace' }}>
               SA Agro-Ecological States
             </div>
             {Object.entries(sidebarData.states || {}).map(([state, count]) => (
               <div key={state} className="state-row">
-                <span style={{ color: 'var(--text)' }}>{state}</span>
-                <span style={{ color: 'var(--accent)' }}>
+                <span style={{ color: 'rgba(255,255,255,0.9)' }}>{state}</span>
+                <span style={{ color: 'rgba(255,255,255,0.95)', fontWeight: 600 }}>
                   {count} ({((count / sidebarData.n_total) * 100).toFixed(0)}%)
                 </span>
               </div>

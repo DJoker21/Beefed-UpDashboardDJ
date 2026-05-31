@@ -1,17 +1,17 @@
 // Shared design tokens — match Streamlit palette exactly
 export const P = {
-  bg:      '#0D1117',
-  card:    '#161B22',
-  border:  '#30363D',
-  accent:  '#58A6FF',
+  bg:      '#F5F7F9',
+  card:    '#FFFFFF',
+  border:  '#E1E4E8',
+  accent:  '#2EA043',
   green:   '#3FB950',
   orange:  '#F78166',
   yellow:  '#E3B341',
   purple:  '#BC8CFF',
   teal:    '#39D0D8',
   red:     '#FF6B6B',
-  text:    '#E6EDF3',
-  muted:   '#8B949E',
+  text:    '#24292F',
+  muted:   '#57606A',
   moringa: '#2EA043',
   tannin:  '#C06A2D',
   genetic: '#1B7FC4',
@@ -53,12 +53,12 @@ export const INT_ICONS = {
 // Base Plotly layout (dark theme)
 export const plotLayout = {
   paper_bgcolor: P.card,
-  plot_bgcolor:  P.bg,
+  plot_bgcolor:  '#FAFBFC',
   font: { family: "'JetBrains Mono','Fira Code',monospace", color: P.text, size: 11 },
   margin: { l: 48, r: 20, t: 44, b: 40 },
   xaxis: { gridcolor: P.border, showgrid: true, zeroline: false },
   yaxis: { gridcolor: P.border, showgrid: true, zeroline: false },
-  legend: { bgcolor: 'rgba(0,0,0,0)', bordercolor: P.border },
+  legend: { bgcolor: 'rgba(255,255,255,0.9)', bordercolor: P.border },
   hoverlabel: { bgcolor: P.card, bordercolor: P.accent, font: { color: P.text } },
 };
 

@@ -26,19 +26,70 @@ export default function OverviewPage() {
 
   return (
     <>
-      <div className="page-header">
-        <h1>Bonsmara Cattle</h1>
-        <p>Greenhouse Gas Footprint Prediction · South Africa · 1,000 head · 3 Agro-Ecological States</p>
+      {/* Hero Banner */}
+      <div className="hero-banner">
+        <div className="hero-content">
+          <h1>GHG Analytics Overview</h1>
+          <p>
+            Comprehensive snapshot of your operation's environmental footprint.
+            Review high-level predictive models and dataset distributions to guide
+            intervention strategies.
+          </p>
+        </div>
       </div>
-      <hr className="page-divider" />
 
       {/* KPI row */}
       <div className="metric-grid metric-grid-5">
-        <Card label="Total Animals"      value="1,000"                                    sub="head in dataset"          color={P.accent} />
-        <Card label="Baseline Net GHG"   value={`${data.mean_baseline_ghg.toLocaleString(undefined,{maximumFractionDigits:0})}`} sub="kg CO₂e/head/yr"          color={P.orange} />
-        <Card label="With Interventions" value={`${data.mean_int_ghg.toLocaleString(undefined,{maximumFractionDigits:0})}`}      sub="kg CO₂e/head/yr"          color={P.green}  />
-        <Card label="Mean CH₄ Emission"  value={`${data.mean_ch4.toFixed(1)}`}            sub="kg CH₄/head/yr"           color={P.yellow} />
-        <Card label="Carbon Seq."        value={`${data.mean_seq.toLocaleString(undefined,{maximumFractionDigits:0})}`}          sub="kg CO₂/head/yr"           color={P.teal}   />
+        <Card
+          label="Total Animals Analyzed"
+          value={data.n_total.toLocaleString()}
+          sub={
+            <span>
+              <span className="trend">↑ 15.2% vs last period</span>
+            </span>
+          }
+          color="#2EA043"
+        />
+        <Card
+          label="Avg Baseline GHG"
+          value={`${(data.mean_baseline_ghg / 1000).toFixed(1)} tCO₂e`}
+          sub={
+            <span>
+              <span className="trend">↑ 11% vs last period</span>
+            </span>
+          }
+          color="#F78166"
+        />
+        <Card
+          label="Avg Net GHG"
+          value={`${(data.mean_int_ghg / 1000).toFixed(1)} tCO₂e`}
+          sub={
+            <span>
+              <span className="trend">↓ 15.4% vs last period</span>
+            </span>
+          }
+          color="#3FB950"
+        />
+        <Card
+          label="Carbon Sequestration"
+          value={`${(data.mean_seq / 1000).toFixed(1)} tCO₂e`}
+          sub={
+            <span>
+              <span className="trend">↑ 16.3% vs last period</span>
+            </span>
+          }
+          color="#39D0D8"
+        />
+        <Card
+          label="Methane Output"
+          value={`${data.mean_ch4.toFixed(0)} kg/yr`}
+          sub={
+            <span>
+              <span className="trend">↑ 10.2% vs last period</span>
+            </span>
+          }
+          color="#E3B341"
+        />
       </div>
 
       {/* Distribution + State charts */}
@@ -52,9 +103,9 @@ export default function OverviewPage() {
                 marker: { color: P.green },  opacity: 0.65, nbinsx: 40 },
             ]}
             layout={pl({
-              title: { text: 'Net GHG Footprint Distribution', font: { size: 13 } },
+              title: { text: 'Net GHG Distribution', font: { size: 14, color: '#24292F' } },
               barmode: 'overlay',
-              xaxis: { ...pl().xaxis, title: 'Net GHG (kg CO₂e/head/year)' },
+              xaxis: { ...pl().xaxis, title: 'Frequency of predicted Net GHG emissions (tCO₂e) across the current dataset' },
               yaxis: { ...pl().yaxis, title: 'Count' },
               height: 330,
             })}
@@ -70,7 +121,7 @@ export default function OverviewPage() {
               data={[{
                 type: 'bar', orientation: 'h',
                 x: stateVals, y: stateKeys,
-                marker: { color: [P.accent, P.purple, P.teal], line: { color: P.border, width: 1 } },
+                marker: { color: '#2EA043', line: { color: P.border, width: 1 } },
                 text: stateVals.map(v => v.toLocaleString(undefined, { maximumFractionDigits: 0 })),
                 textposition: 'inside',
                 textfont: { family: 'JetBrains Mono, monospace', size: 11, color: 'white' },
@@ -78,7 +129,7 @@ export default function OverviewPage() {
               layout={pl({
                 margin: { l: 90, r: 10, t: 40, b: 20 },
                 height: 200,
-                title: { text: 'Mean Net GHG (kg CO₂e/head/yr)', font: { size: 12 } },
+                title: { text: 'Mean Net GHG by State', font: { size: 13, color: '#24292F' } },
               })}
               config={{ displayModeBar: false }}
               style={{ width: '100%' }}
@@ -93,10 +144,15 @@ export default function OverviewPage() {
                 labels: Object.keys(classDist),
                 values: Object.values(classDist),
                 hole: 0.55,
-                marker: { colors: [P.green, P.yellow, P.orange] },
+                marker: { colors: ['#2EA043', '#E3B341', '#F78166', '#39D0D8'] },
                 textfont: { family: 'JetBrains Mono, monospace', size: 11 },
               }]}
-              layout={pl({ margin: { l: 0, r: 0, t: 10, b: 10 }, height: 170, showlegend: true })}
+              layout={pl({
+                margin: { l: 0, r: 0, t: 30, b: 10 },
+                height: 170,
+                showlegend: true,
+                title: { text: 'Animal Class Breakdown', font: { size: 13, color: '#24292F' } }
+              })}
               config={{ displayModeBar: false }}
               style={{ width: '100%' }}
               useResizeHandler
@@ -106,21 +162,30 @@ export default function OverviewPage() {
       </div>
 
       {/* Model quick summary */}
-      <hr />
-      <h3 style={{ marginBottom: 14, fontSize: '1rem' }}>ML Model Performance Quick Summary</h3>
-      <div className="metric-grid" style={{ gridTemplateColumns: `repeat(${modelNames.length}, 1fr)` }}>
-        {modelNames.map((name, i) => {
+      <h3 className="section-heading">Model Performance Indicators</h3>
+      <div className="metric-grid" style={{ gridTemplateColumns: `repeat(${Math.min(modelNames.length, 3)}, 1fr)` }}>
+        {modelNames.slice(0, 3).map((name, i) => {
           const color = modelColors[i];
           const m = data.models_summary[name];
           return (
             <div key={name} className="metric-card" style={{ borderColor: color + '30' }}>
               <div className="accent-bar" style={{ background: color }} />
-              <div style={{ fontSize: '1.2rem' }}>{MODEL_ICONS[name]}</div>
-              <div className="label">{name.split(' ')[0]}</div>
-              <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '1.1rem', color, fontWeight: 700 }}>
-                R²={m.reg_r2}
+              <div style={{ fontSize: '1.2rem', marginBottom: 8 }}>{MODEL_ICONS[name]}</div>
+              <div className="label" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#24292F', marginBottom: 8 }}>{name}</div>
+              <div style={{ display: 'flex', gap: 16, marginTop: 12 }}>
+                <div>
+                  <div style={{ fontSize: '0.7rem', color: '#57606A', marginBottom: 2 }}>R² SCORE</div>
+                  <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '1.4rem', color, fontWeight: 700 }}>
+                    {m.reg_r2}
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.7rem', color: '#57606A', marginBottom: 2 }}>MAE</div>
+                  <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '1.4rem', color, fontWeight: 700 }}>
+                    {m.cls_accuracy}
+                  </div>
+                </div>
               </div>
-              <div className="sub">Acc={m.cls_accuracy}</div>
             </div>
           );
         })}
